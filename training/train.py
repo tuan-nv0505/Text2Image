@@ -285,7 +285,6 @@ def main(args):
                             logger.info(f"Saved generated sample to {save_path}")
 
                         vae.to("cpu")
-                        embedder.to("cpu")
 
                 dist.barrier()
 
