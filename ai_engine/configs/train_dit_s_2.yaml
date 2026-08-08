@@ -1,0 +1,29 @@
+dataset:
+  data_path: /kaggle/input/flickr8k
+  latents_path: /kaggle/input/flickr8k-latents
+  text_embeds_path: /kaggle/input/flickr8k-text-embeds
+  image_size: 256
+  num_workers: 4
+
+model:
+  name: DiT-S/2
+  vae: ema
+
+training:
+  epochs: 1500
+  global_batch_size: 256
+  global_seed: 0
+  optimizer:
+    lr: 1.0e-4
+    weight_decay: 0.0
+
+sampling:
+  cfg_scale: 1.5
+  num_sampling_steps: 1000
+  prompt: A man riding a bicycle.
+
+logging:
+  results_dir: results
+  log_every: 100
+  ckpt_every: 1000
+  resume_ckpt: null
