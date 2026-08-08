@@ -18,7 +18,7 @@ training:
     weight_decay: 0.0
 
 sampling:
-  cfg_scale: 1.5
+  cfg_scale: 4
   num_sampling_steps: 1000
   prompt: A man riding a bicycle.
 
