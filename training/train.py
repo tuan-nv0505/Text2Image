@@ -259,7 +259,6 @@ def main(args):
                         ema.eval()
 
                         vae.to(device)
-                        embedder.to(device)
 
                         with torch.inference_mode(), torch.autocast(device_type="cuda", dtype=amp_dtype):
                             sample_model_kwargs = dict(
