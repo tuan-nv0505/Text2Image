@@ -18,3 +18,6 @@ class VAE:
         latent = latent / 0.18215
         image = self.model.decode(latent).sample
         return image
+
+    def to(self, device):
+        self.model.to(device)

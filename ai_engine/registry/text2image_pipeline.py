@@ -16,7 +16,7 @@ class TextToImagePipeline:
             dit_checkpoint_path: str = "",
             vae_name: str = "ema",
             t5_name: str = "google/t5-v1_1-large",
-            latent_size: int = 32,  # Ví dụ: Ảnh 256x256 -> latent 32
+            latent_size: int = 32,
             device: str = "cuda"
     ):
         self.dit_model_name = dit_model_name
@@ -25,13 +25,10 @@ class TextToImagePipeline:
         self.t5_name = t5_name
         self.latent_size = latent_size
 
-        # Mặc định thiết bị tính toán chính
         self.device = torch.device(device if torch.cuda.is_available() else "cpu")
 
-        # Gọi Registry (Thủ thư)
         self.registry = ModelRegistry()
 
-        # Kiểm tra hỗ trợ Mixed Precision để tăng tốc
         self.amp_dtype = torch.bfloat16 if (
                     self.device.type == 'cuda' and torch.cuda.is_bf16_supported()) else torch.float16
 
@@ -44,10 +41,6 @@ class TextToImagePipeline:
             guidance_scale: float = 4.0,
             seed: Optional[int] = None
     ) -> Image.Image:
-        """
-        Quy trình sinh ảnh từ văn bản End-to-End.
-        """
-        # 1. Cài đặt seed để có thể tái tạo lại ảnh (nếu cần)
         if seed is not None:
             torch.manual_seed(seed)
             if self.device.type == 'cuda':

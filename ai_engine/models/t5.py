@@ -163,6 +163,9 @@ class T5Embedder:
 
         return caption.strip()
 
+    def to(self, device):
+        self.model.to(device)
+
 
 if __name__ == "__main__":
     embedder = T5Embedder(device='cpu')
