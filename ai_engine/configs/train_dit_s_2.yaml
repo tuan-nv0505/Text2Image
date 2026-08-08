@@ -25,5 +25,5 @@ sampling:
 logging:
   results_dir: results
   log_every: 100
-  ckpt_every: 1000
+  ckpt_every: 300
   resume_ckpt: null
