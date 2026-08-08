@@ -26,4 +26,4 @@ logging:
   results_dir: results
   log_every: 100
   ckpt_every: 1000
-  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint/checkpoint.pt
+  resume_ckpt: null
