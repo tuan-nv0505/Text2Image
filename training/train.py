@@ -18,7 +18,7 @@ from ai_engine.models.diffusion_transformer import DiffusionTransformer_models
 from ai_engine.models.t5 import T5Embedder
 from ai_engine.models.vae import VAE
 from dataset import Flickr8kDataset
-from .utils import center_crop_arr, cleanup, create_logger, requires_grad, update_ema
+from training.utils import center_crop_arr, cleanup, create_logger, requires_grad, update_ema
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True

@@ -1,6 +1,6 @@
 import numpy as np
 import torch as th
-from .gaussian_diffusion import GaussianDiffusion
+from ai_engine.diffusion.gaussian_diffusion import GaussianDiffusion
 
 def space_timesteps(num_timesteps, section_counts):
     if isinstance(section_counts, str):

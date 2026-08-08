@@ -5,11 +5,11 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from .utils import to_2tuple, auto_grad_checkpoint
-from .modules.attention import Attention, CrossAttention
-from .modules.drop_path import DropPath
-from .modules.mlp import MLP
-from .modules.path_embed import PatchEmbed
+from ai_engine.models.utils import to_2tuple, auto_grad_checkpoint
+from ai_engine.models.modules.attention import Attention, CrossAttention
+from ai_engine.models.modules.drop_path import DropPath
+from ai_engine.models.modules.mlp import MLP
+from ai_engine.models.modules.path_embed import PatchEmbed
 
 
 def modulate(x, shift, scale):

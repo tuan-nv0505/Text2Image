@@ -1,5 +1,5 @@
-from .gaussian_diffusion import ModelMeanType, ModelVarType, LossType, get_named_beta_schedule
-from .respace import space_timesteps, SpacedDiffusion
+from ai_engine.diffusion.gaussian_diffusion import ModelMeanType, ModelVarType, LossType, get_named_beta_schedule
+from ai_engine.diffusion.respace import space_timesteps, SpacedDiffusion
 
 
 def create_diffusion(

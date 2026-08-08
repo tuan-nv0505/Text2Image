@@ -2,7 +2,7 @@ from typing import Optional, Type, Union, Tuple, Callable
 
 import torch.nn as nn
 
-from models.utils import to_2tuple
+from ai_engine.models.utils import to_2tuple
 
 
 class MLP(nn.Module):

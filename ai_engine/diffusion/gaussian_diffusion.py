@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import enum
-from .diffusion_utils import discretized_gaussian_log_likelihood, normal_kl, mean_flat, extract_into_tensor
+from ai_engine.diffusion.diffusion_utils import discretized_gaussian_log_likelihood, normal_kl, mean_flat, extract_into_tensor
 
 
 class ModelMeanType(enum.Enum):
