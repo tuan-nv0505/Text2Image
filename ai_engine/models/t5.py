@@ -10,8 +10,7 @@ from transformers import T5EncoderModel, AutoTokenizer
 
 
 class T5Embedder:
-    bad_punct_regex = re.compile(
-        r'[' + '#®•©™&@·º½¾¿¡§~' + '\)' + '\(' + '\]' + '\[' + '\}' + '\{' + '\|' + '\\' + '\/' + '\*' + r']{1,}')  # noqa
+    bad_punct_regex = re.compile(r'[#®•©™&@·º½¾¿¡§~\)\(\]\[\}\{\|\\\/\*]{1,}')  # noqa
 
     def __init__(self, device, dir_or_name='google/t5-v1_1-large', *, cache_dir=None, hf_token=None,
                  use_text_preprocessing=True, torch_dtype=None, model_max_length=120):
