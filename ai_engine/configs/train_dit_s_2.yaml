@@ -14,7 +14,7 @@ training:
   global_batch_size: 128
   global_seed: 0
   optimizer:
-    lr: 1e-4
+    lr: 5e-5
     weight_decay: 1e-4
 
 sampling:

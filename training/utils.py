@@ -1,6 +1,8 @@
 import logging
+import os
 import sys
 from collections import OrderedDict
+from glob import glob
 
 import numpy as np
 import torch
@@ -65,3 +67,15 @@ def center_crop_arr(pil_image, image_size):
     crop_y = (arr.shape[0] - image_size) // 2
     crop_x = (arr.shape[1] - image_size) // 2
     return Image.fromarray(arr[crop_y: crop_y + image_size, crop_x: crop_x + image_size])
+
+
+def manage_checkpoints(checkpoint_dir, max_to_keep_checkpoint=10):
+    checkpoints = sorted(glob(os.path.join(checkpoint_dir, "checkpoint_*.pt")), key=os.path.getmtime)
+    checkpoints = [c for c in checkpoints if "checkpoint_latest.pt" not in c]
+    while len(checkpoints) > max_to_keep_checkpoint:
+        oldest_checkpoint = checkpoints.pop(0)
+        try:
+            if os.path.exists(oldest_checkpoint):
+                os.remove(oldest_checkpoint)
+        except OSError as e:
+            print(f"Error deleting old checkpoint {oldest_checkpoint}: {e}")

@@ -373,13 +373,13 @@ def DiT_B_8(**kwargs):
     return DiffusionTransformer(depth=12, hidden_size=768, patch_size=8, num_heads=12, **kwargs)
 
 def DiT_S_2(**kwargs):
-    return DiffusionTransformer(depth=12, hidden_size=384, patch_size=2, num_heads=6, **kwargs)
+    return DiffusionTransformer(depth=8, hidden_size=384, patch_size=2, num_heads=6, **kwargs)
 
 def DiT_S_4(**kwargs):
-    return DiffusionTransformer(depth=12, hidden_size=384, patch_size=4, num_heads=6, **kwargs)
+    return DiffusionTransformer(depth=8, hidden_size=384, patch_size=4, num_heads=6, **kwargs)
 
 def DiT_S_8(**kwargs):
-    return DiffusionTransformer(depth=12, hidden_size=384, patch_size=8, num_heads=6, **kwargs)
+    return DiffusionTransformer(depth=8, hidden_size=384, patch_size=8, num_heads=6, **kwargs)
 
 
 DiffusionTransformer_models = {
@@ -390,6 +390,6 @@ DiffusionTransformer_models = {
 }
 
 if __name__ == "__main__":
-    model = DiffusionTransformer_models["DiT-B/2"]()
+    model = DiffusionTransformer_models["DiT-S/2"]()
     total_params = sum(p.numel() for p in model.parameters())
     print(f"Total parameters: {total_params:,}")
