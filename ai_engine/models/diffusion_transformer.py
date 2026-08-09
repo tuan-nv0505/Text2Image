@@ -390,6 +390,6 @@ DiffusionTransformer_models = {
 }
 
 if __name__ == "__main__":
-    model = DiffusionTransformer_models["DiT-XL/2"]()
+    model = DiffusionTransformer_models["DiT-S/2"]()
     total_params = sum(p.numel() for p in model.parameters())
     print(f"Total parameters: {total_params:,}")
