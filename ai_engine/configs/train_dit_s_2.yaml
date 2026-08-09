@@ -6,16 +6,16 @@ dataset:
   num_workers: 4
 
 model:
-  name: DiT-S/2
+  name: DiT-B/2
   vae: ema
 
 training:
   epochs: 1500
-  global_batch_size: 256
+  global_batch_size: 64
   global_seed: 0
   optimizer:
-    lr: 1.0e-4
-    weight_decay: 0.0
+    lr: 2e-5
+    weight_decay: 3e-2
 
 sampling:
   cfg_scale: 4
