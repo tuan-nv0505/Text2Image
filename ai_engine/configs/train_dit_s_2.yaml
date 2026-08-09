@@ -14,8 +14,8 @@ training:
   global_batch_size: 256
   global_seed: 0
   optimizer:
-    lr: 5e-5
-    weight_decay: 0
+    lr: 1e-4
+    weight_decay: 1e-4
 
 sampling:
   cfg_scale: 4

@@ -1,6 +1,8 @@
 import os
 import gc
 import torch
+import random
+from collections import defaultdict
 from PIL import Image
 from tqdm import tqdm
 from torch.utils.data import Dataset
@@ -20,7 +22,8 @@ class Flickr8kDataset(Dataset):
             split="train",
             image_size=256,
             device=None,
-            transform=None
+            transform=None,
+            p_uncond=0.1
     ):
         self.root = root
         self.split = split
@@ -29,6 +32,7 @@ class Flickr8kDataset(Dataset):
         self.vae = vae
         self.latents_dir = latents_dir
         self.text_embs_dir = text_embs_dir
+        self.p_uncond = p_uncond
 
         if device is None:
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -111,6 +115,8 @@ class Flickr8kDataset(Dataset):
             valid_images = {line.strip() for line in f}
 
         caption_path = os.path.join(self.root, "Flickr8k_text/Flickr8k.token.txt")
+
+        image_to_captions = defaultdict(list)
         idx = 0
         with open(caption_path, "r") as f:
             for line in f:
@@ -118,20 +124,28 @@ class Flickr8kDataset(Dataset):
                 if not line: continue
                 image_name = line.split("\t")[0].split("#")[0]
                 if image_name in valid_images:
-                    self.samples.append((image_name, idx))
+                    image_to_captions[image_name].append(idx)
                 idx += 1
+
+        self.samples = [(img, caps) for img, caps in image_to_captions.items()]
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, idx):
-        image_name, caption_idx = self.samples[idx]
-
+        image_name, caption_indices = self.samples[idx]
         latent = torch.load(os.path.join(self.latents_dir, f"{image_name}.pt"), weights_only=True)
+        caption_idx = random.choice(caption_indices)
         text_data = torch.load(os.path.join(self.text_embs_dir, f"emb_{caption_idx:06d}.pt"), weights_only=True)
 
-        return latent, text_data['embeddings'], text_data['attention_mask']
+        embeddings = text_data['embeddings']
+        attention_mask = text_data['attention_mask']
 
+        if random.random() < self.p_uncond:
+            embeddings = torch.zeros_like(embeddings)
+            attention_mask = torch.zeros_like(attention_mask)
+
+        return latent, embeddings, attention_mask
 
 if __name__ == "__main__":
     import argparse
