@@ -15,7 +15,7 @@ training:
   global_seed: 0
   optimizer:
     lr: 1e-4
-    weight_decay: 1e-4
+    weight_decay: 0
 
 sampling:
   cfg_scale: 4
