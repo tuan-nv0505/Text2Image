@@ -11,7 +11,7 @@ model:
 
 training:
   epochs: 1000
-  global_batch_size: 64
+  global_batch_size: 256
   global_seed: 0
   optimizer:
     lr: 1e-4
@@ -24,6 +24,6 @@ sampling:
 
 logging:
   results_dir: results
-  log_every: 50
+  log_every: 10
   ckpt_every: 100
   resume_ckpt: null
