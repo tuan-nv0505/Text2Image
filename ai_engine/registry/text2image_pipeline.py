@@ -1,12 +1,13 @@
-import logging
+import time
+from typing import Optional
+
 import torch
 import numpy as np
 from PIL import Image
-from typing import Optional, Tuple
 
 from ai_engine.registry.model_registry import ModelRegistry
 
-logger = logging.getLogger(__name__)
+from backend.core.logger import logger
 
 
 class TextToImagePipeline:
@@ -17,7 +18,6 @@ class TextToImagePipeline:
             vae_name: str = "ema",
             t5_name: str = "google/t5-v1_1-large",
             latent_size: int = 32,
-            device: str = "cuda"
     ):
         self.dit_model_name = dit_model_name
         self.dit_checkpoint_path = dit_checkpoint_path
@@ -25,12 +25,19 @@ class TextToImagePipeline:
         self.t5_name = t5_name
         self.latent_size = latent_size
 
-        self.device = torch.device(device if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+            self.amp_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+        elif torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+            self.amp_dtype = torch.float32
+        else:
+            self.device = torch.device("cpu")
+            self.amp_dtype = torch.float32
+
+        logger.info(f"Pipeline initialized on device: {self.device}, Dtype: {self.amp_dtype}")
 
         self.registry = ModelRegistry()
-
-        self.amp_dtype = torch.bfloat16 if (
-                    self.device.type == 'cuda' and torch.cuda.is_bf16_supported()) else torch.float16
 
     @torch.inference_mode()
     def generate(
@@ -41,96 +48,86 @@ class TextToImagePipeline:
             guidance_scale: float = 4.0,
             seed: Optional[int] = None
     ) -> Image.Image:
-        if seed is not None:
-            torch.manual_seed(seed)
-            if self.device.type == 'cuda':
-                torch.cuda.manual_seed_all(seed)
 
-        logger.info(f"Bắt đầu sinh ảnh với prompt: '{prompt}'")
+        start_time = time.time()
 
-        # ==========================================
-        # BƯỚC 1: XỬ LÝ VĂN BẢN BẰNG T5
-        # ==========================================
-        t5 = self.registry.get_t5(dir_or_name=self.t5_name, device=self.device)
+        try:
+            if seed is not None:
+                torch.manual_seed(seed)
+                if self.device.type == 'cuda':
+                    torch.cuda.manual_seed_all(seed)
 
-        # Lấy embedding cho prompt (có điều kiện) và negative prompt (không điều kiện)
-        cond_embeddings, cond_mask = t5.get_text_embeddings([prompt])
-        uncond_embeddings, uncond_mask = t5.get_text_embeddings([negative_prompt])
+            logger.info(f"Starting image generation. Prompt: '{prompt[:50]}...'")
 
-        # Ghép lại để chạy Classifier-Free Guidance (CFG)
-        context = torch.cat([cond_embeddings, uncond_embeddings], dim=0).unsqueeze(1)
-        mask = torch.cat([cond_mask, uncond_mask], dim=0)
+            logger.debug("Running T5 Text Encoder...")
+            t5 = self.registry.get_t5(dir_or_name=self.t5_name, device=self.device)
 
-        # QUAN TRỌNG: Offload T5 về CPU ngay lập tức
-        t5.offload()
-        logger.debug("Đã offload T5 về CPU.")
+            cond_embeddings, cond_mask = t5.get_text_embeddings([prompt])
+            uncond_embeddings, uncond_mask = t5.get_text_embeddings([negative_prompt])
 
-        # ==========================================
-        # BƯỚC 2: QUÁ TRÌNH KHỬ NHIỄU (DIFFUSION) BẰNG DiT
-        # ==========================================
-        # Khởi tạo nhiễu ngẫu nhiên (Latent noise)
-        z = torch.randn(1, 4, self.latent_size, self.latent_size, device=self.device)
-        z = torch.cat([z, z], dim=0)  # Ghép đôi cho CFG
+            context = torch.cat([cond_embeddings, uncond_embeddings], dim=0).unsqueeze(1)
+            mask = torch.cat([cond_mask, uncond_mask], dim=0)
 
-        # Gọi DiT và thuật toán lấy mẫu (Diffusion) từ Registry
-        dit = self.registry.get_dit(
-            model_name=self.dit_model_name,
-            checkpoint_path=self.dit_checkpoint_path,
-            latent_size=self.latent_size,
-            device=self.device
-        )
-        diffusion = self.registry.get_diffusion(sampling_steps=num_inference_steps)
+            t5.offload()
 
-        logger.info(f"Đang chạy khử nhiễu {num_inference_steps} steps...")
+            logger.debug("T5 successfully offloaded to CPU.")
 
-        # Chạy vòng lặp khử nhiễu (Denoising loop) với Mixed Precision
-        with torch.autocast(device_type=self.device.type, dtype=self.amp_dtype):
-            model_kwargs = dict(y=context, mask=mask, cfg_scale=guidance_scale)
-            samples = diffusion.p_sample_loop(
-                dit.forward_with_cfg,
-                z.shape,
-                z,
-                clip_denoised=False,
-                model_kwargs=model_kwargs,
-                progress=True,  # Có thể tắt nếu chạy nền trên server
+            logger.info(f"Running Diffusion loop for {num_inference_steps} steps...")
+
+            z = torch.randn(1, 4, self.latent_size, self.latent_size, device=self.device)
+            z = torch.cat([z, z], dim=0)
+
+            dit = self.registry.get_dit(
+                model_name=self.dit_model_name,
+                checkpoint_path=self.dit_checkpoint_path,
+                latent_size=self.latent_size,
                 device=self.device
             )
+            diffusion = self.registry.get_diffusion(sampling_steps=num_inference_steps)
 
-        # Tách phần có điều kiện (conditional) ra sau khi dùng CFG
-        samples, _ = samples.chunk(2, dim=0)
+            autocast_device = "cuda" if self.device.type == "cuda" else "cpu"
 
-        # QUAN TRỌNG: Offload DiT về CPU
-        dit.to("cpu")
-        logger.debug("Đã offload DiT về CPU.")
+            with torch.autocast(device_type=autocast_device, dtype=self.amp_dtype):
+                model_kwargs = dict(y=context, mask=mask, cfg_scale=guidance_scale)
+                samples = diffusion.p_sample_loop(
+                    dit.forward_with_cfg,
+                    z.shape,
+                    z,
+                    clip_denoised=False,
+                    model_kwargs=model_kwargs,
+                    progress=False,
+                    device=self.device
+                )
 
-        # ==========================================
-        # BƯỚC 3: GIẢI MÃ LATENT THÀNH ẢNH BẰNG VAE
-        # ==========================================
-        vae = self.registry.get_vae(pretrained_name=self.vae_name, device=self.device)
+            samples, _ = samples.chunk(2, dim=0)
+            dit.to("cpu")
+            if self.device.type == "cuda": torch.cuda.empty_cache()
+            logger.debug("DiT successfully offloaded to CPU.")
 
-        logger.info("Đang giải mã ảnh (VAE decoding)...")
-        with torch.autocast(device_type=self.device.type, dtype=self.amp_dtype):
-            decoded_samples = vae.decode(latent=samples)
-            # Chuẩn hóa tensor từ khoảng [-1, 1] về [0, 1]
-            decoded_samples = (decoded_samples / 2 + 0.5).clamp(0, 1)
+            logger.info("Decoding latent to image using VAE...")
+            vae = self.registry.get_vae(pretrained_name=self.vae_name, device=self.device)
 
-        # QUAN TRỌNG: Offload VAE về CPU
-        vae.to("cpu")
-        logger.debug("Đã offload VAE về CPU.")
+            with torch.autocast(device_type=autocast_device, dtype=self.amp_dtype):
+                decoded_samples = vae.decode(latent=samples)
+                decoded_samples = (decoded_samples / 2 + 0.5).clamp(0, 1)
 
-        # ==========================================
-        # BƯỚC 4: HẬU XỬ LÝ ẢNH (POST-PROCESSING)
-        # ==========================================
-        image = self._tensor_to_pil(decoded_samples)
-        logger.info("Hoàn thành sinh ảnh!")
+            vae.to("cpu")
+            if self.device.type == "cuda": torch.cuda.empty_cache()
+            logger.debug("VAE successfully offloaded to CPU.")
 
-        return image
+            image = self._tensor_to_pil(decoded_samples)
+
+            process_time = time.time() - start_time
+            logger.info(f"Image generation completed successfully in {process_time:.2f} seconds.")
+
+            return image
+
+        except Exception as e:
+            logger.exception("Critical error during image generation!")
+            self.registry.clear_cache()
+            raise e
 
     def _tensor_to_pil(self, tensor: torch.Tensor) -> Image.Image:
-        """Chuyển đổi tensor PyTorch thành ảnh PIL để có thể lưu dưới dạng PNG/JPG."""
-        # Chuyển [B, C, H, W] -> [B, H, W, C] và gỡ khỏi GPU
         tensor = tensor.detach().cpu().permute(0, 2, 3, 1).numpy()
-        # Scale về [0, 255]
         images = (tensor * 255).round().astype(np.uint8)
-        # Vì batch_size hiện tại là 1, ta lấy ảnh đầu tiên
         return Image.fromarray(images[0])
