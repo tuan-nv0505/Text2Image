@@ -7,7 +7,7 @@ from PIL import Image
 
 from ai_engine.registry.model_registry import ModelRegistry
 
-from backend.core.logger import logger
+from ai_engine.logger import logger
 
 
 class TextToImagePipeline:
