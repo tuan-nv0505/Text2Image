@@ -20,8 +20,8 @@ from ai_engine.models.vae import VAE
 from dataset import Flickr8kDataset
 from training.utils import center_crop_arr, cleanup, create_logger, requires_grad, update_ema, manage_checkpoints
 
-torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cudnn.allow_tf32 = True
+# torch.backends.cuda.matmul.allow_tf32 = True
+# torch.backends.cudnn.allow_tf32 = True
 
 
 def main(args):
