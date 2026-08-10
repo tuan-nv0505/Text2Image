@@ -10,7 +10,7 @@ model:
   vae: ema
 
 training:
-  epochs: 1000
+  epochs: 1500
   global_batch_size: 128
   global_seed: 0
   optimizer:
@@ -20,7 +20,7 @@ training:
 sampling:
   model_type: model
   cfg_scale: 1.5
-  num_sampling_steps: 1500
+  num_sampling_steps: 1000
   prompt: A man riding a bicycle.
 
 logging:
