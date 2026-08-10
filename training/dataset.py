@@ -135,7 +135,7 @@ class Flickr8kDataset(Dataset):
     def __getitem__(self, idx):
         image_name, caption_indices = self.samples[idx]
         latent = torch.load(os.path.join(self.latents_dir, f"{image_name}.pt"), weights_only=True)
-        caption_idx = random.choice(caption_indices)
+        caption_idx = caption_indices[0]
         text_data = torch.load(os.path.join(self.text_embs_dir, f"emb_{caption_idx:06d}.pt"), weights_only=True)
 
         embeddings = text_data['embeddings']
