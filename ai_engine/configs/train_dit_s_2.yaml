@@ -27,4 +27,4 @@ logging:
   results_dir: results
   log_every: 10
   ckpt_every: 100
-  resume_ckpt: /kaggle/working/checkpoint_0073900.pt
+  resume_ckpt: null
