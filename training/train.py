@@ -93,11 +93,6 @@ def main(args):
     opt = torch.optim.AdamW(model.parameters(), lr=args.training.optimizer.lr,
                             weight_decay=args.training.optimizer.weight_decay)
 
-    amp_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
-    scaler = torch.amp.GradScaler('cuda', enabled=(amp_dtype == torch.float16))
-    if rank == 0:
-        logger.info(f"Using Mixed Precision with dtype: {amp_dtype}")
-
     start_epoch = 0
     train_steps = 0
     start_epoch_step = 0
@@ -110,9 +105,6 @@ def main(args):
         model.module.load_state_dict(checkpoint["model"])
         ema.load_state_dict(checkpoint["ema"])
         opt.load_state_dict(checkpoint["opt"])
-        if "scaler" in checkpoint:
-            scaler.load_state_dict(checkpoint["scaler"])
-
         start_epoch = checkpoint.get("epoch", 0)
         train_steps = checkpoint.get("train_steps", 0)
         start_epoch_step = checkpoint.get("epoch_step", -1) + 1
@@ -189,15 +181,13 @@ def main(args):
             t = torch.randint(0, diffusion.num_timesteps, (x.shape[0],), device=device)
             model_kwargs = dict(y=y.unsqueeze(1), mask=mask)
 
-            with torch.autocast(device_type="cuda", dtype=amp_dtype):
-                loss_dict = diffusion.training_losses(model, x, t, model_kwargs)
-                loss = loss_dict["loss"].mean()
+            loss_dict = diffusion.training_losses(model, x, t, model_kwargs)
+            loss = loss_dict["loss"].mean()
 
             opt.zero_grad(set_to_none=True)
 
-            scaler.scale(loss).backward()
-            scaler.step(opt)
-            scaler.update()
+            loss.backward()
+            opt.step()
 
             update_ema(ema, model.module)
 
@@ -225,7 +215,6 @@ def main(args):
                         "model": model.module.state_dict(),
                         "ema": ema.state_dict(),
                         "opt": opt.state_dict(),
-                        "scaler": scaler.state_dict(),
                         "args": args,
                         "epoch": epoch,
                         "train_steps": train_steps,
@@ -244,18 +233,22 @@ def main(args):
 
                     if fixed_embeddings is not None:
                         logger.info(f"Generating 1 sample image for step {train_steps} with CFG...")
-                        ema.eval()
+                        sample_model = (
+                            ema if args.sampling.model_type == "ema"
+                            else model.module
+                        )
+                        sample_model.eval()
 
                         vae.to(device)
 
-                        with torch.inference_mode(), torch.autocast(device_type="cuda", dtype=amp_dtype):
+                        with torch.inference_mode():
                             sample_model_kwargs = dict(
                                 y=fixed_embeddings,
                                 mask=fixed_attention_mask,
                                 cfg_scale=args.sampling.cfg_scale,
                             )
                             samples = diffusion.p_sample_loop(
-                                ema.forward_with_cfg,
+                                sample_model.forward_with_cfg,
                                 fixed_z_cfg.shape,
                                 fixed_z_cfg,
                                 clip_denoised=False,
