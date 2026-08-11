@@ -4,6 +4,7 @@ dataset:
   text_embeds_path: /kaggle/input/datasets/tuanbeomap/flickr8k-embeddings-train/Flickr8k_embeddings_train
   image_size: 256
   num_workers: 4
+  p_uncond: 0.05
 
 model:
   name: DiT-S/2

@@ -130,6 +130,7 @@ def main(args):
         transform=transform,
         vae=args.model.vae,
         image_size=args.dataset.image_size,
+        p_uncond=args.dataset.p_uncond
     )
 
     sampler = DistributedSampler(
