@@ -127,9 +127,6 @@ def main(args):
         root=args.dataset.data_path,
         latents_dir=args.dataset.latents_path,
         text_embs_dir=args.dataset.text_embeds_path,
-        transform=transform,
-        vae=args.model.vae,
-        image_size=args.dataset.image_size,
         p_uncond=args.dataset.p_uncond
     )
 
