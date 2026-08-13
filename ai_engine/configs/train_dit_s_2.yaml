@@ -1,7 +1,7 @@
 dataset:
-  data_path: /kaggle/input/datasets/tuanbeomap/flickr8k/flickr8k
-  latents_path: /kaggle/input/datasets/tuanbeomap/flickr8k-latents-train/Flickr8k_latents_train
-  text_embeds_path: /kaggle/input/datasets/tuanbeomap/flickr8k-embeddings-train/Flickr8k_embeddings_train
+  data_path: /kaggle/input/datasets/ltttuyen/flickr8k/flickr8k
+  latents_path: /kaggle/input/datasets/ltttuyen/flickr8k-latents-train/Flickr8k_latents_train
+  text_embeds_path: /kaggle/input/datasets/ltttuyen/flickr8k-embeddings-train/Flickr8k_embeddings_train
   image_size: 256
   num_workers: 4
   p_uncond: 0.1
