@@ -11,8 +11,8 @@ model:
   vae: ema
 
 training:
-  epochs: 1000
-  global_batch_size: 32
+  epochs: 1500
+  global_batch_size: 256
   global_seed: 0
   optimizer:
     lr: 1e-4
@@ -26,6 +26,6 @@ sampling:
 
 logging:
   results_dir: results
-  log_every: 10
-  ckpt_every: 100
+  log_every: 100
+  ckpt_every: 1000
   resume_ckpt: null
