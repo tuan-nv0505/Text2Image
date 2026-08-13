@@ -41,18 +41,20 @@ class Flickr8kDataset(Dataset):
                     image_to_captions[image_name].append(idx)
                 idx += 1
 
-        self.samples = [(img, caps) for img, caps in image_to_captions.items()]
+        self.samples = []
+        for img, caps in image_to_captions.items():
+            for cap_idx in caps:
+                self.samples.append((img, cap_idx))
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, idx):
-        image_name, caption_indices = self.samples[idx]
+        image_name, caption_idx = self.samples[idx]
 
         latent_path = os.path.join(self.latents_dir, f"{image_name}.pt")
         latent = torch.load(latent_path, weights_only=True)
 
-        caption_idx = caption_indices[0]
         text_path = os.path.join(self.text_embs_dir, f"emb_{caption_idx:06d}.pt")
         text_data = torch.load(text_path, weights_only=True)
 

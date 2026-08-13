@@ -10,15 +10,14 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 import torchvision
-from torchvision import transforms
 from omegaconf import OmegaConf
 
 from ai_engine.diffusion import create_diffusion
 from ai_engine.models.diffusion_transformer import DiffusionTransformer_models
 from ai_engine.models.t5 import T5Embedder
 from ai_engine.models.vae import VAE
-from dataset import Flickr8kDataset
-from training.utils import center_crop_arr, cleanup, create_logger, requires_grad, update_ema, manage_checkpoints
+from dataset.dataset import Flickr8kDataset
+from training.utils import cleanup, create_logger, requires_grad, update_ema, manage_checkpoints
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -117,11 +116,6 @@ def main(args):
         del checkpoint
         torch.cuda.empty_cache()
 
-    transform = transforms.Compose([
-        transforms.Lambda(lambda pil_image: center_crop_arr(pil_image, args.dataset.image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], inplace=True),
-    ])
 
     dataset = Flickr8kDataset(
         root=args.dataset.data_path,
