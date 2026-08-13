@@ -252,7 +252,7 @@ def main(args):
                             samples = vae.decode(latent=samples)
                             samples = (samples / 2 + 0.5).clamp(0, 1)
 
-                            save_path = f"{experiment_dir}/sample_{train_steps:07d}.png"
+                            save_path = f"{experiment_dir}/sample.png"
                             torchvision.utils.save_image(samples, save_path)
                             logger.info(f"Saved generated sample to {save_path}")
 
