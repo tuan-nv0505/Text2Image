@@ -12,7 +12,7 @@ model:
 
 training:
   epochs: 1500
-  global_batch_size: 64
+  global_batch_size: 128
   global_seed: 0
   optimizer:
     lr: 1e-4
