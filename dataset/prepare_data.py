@@ -6,7 +6,7 @@ from PIL import Image
 from tqdm import tqdm
 from torchvision import transforms
 
-from training.utils import center_crop_arr
+from dataset.utils import center_crop_arr
 from ai_engine.models.vae import VAE
 from ai_engine.models.t5 import T5Embedder
 
