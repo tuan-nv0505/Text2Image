@@ -219,7 +219,7 @@ def main(args):
                     latest_path = f"{checkpoint_dir}/checkpoint_latest.pt"
                     torch.save(checkpoint, latest_path)
 
-                    manage_checkpoints(checkpoint_dir, max_to_keep_checkpoint=10)
+                    manage_checkpoints(checkpoint_dir, max_to_keep_checkpoint=5)
 
                     logger.info(f"Saved checkpoint to {checkpoint_path} and updated latest.pt")
 
