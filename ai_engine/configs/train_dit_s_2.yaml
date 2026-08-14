@@ -28,4 +28,4 @@ logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: null
+  resume_ckpt: /kaggle/input/datasets/ltttuyen/checkpoint-0023100/checkpoint_0023100.pt
