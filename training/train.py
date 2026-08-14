@@ -78,6 +78,9 @@ def main(args):
         
         checkpoint_manager = CheckpointManager(
             checkpoint_dir=checkpoint_dir,
+            aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+            region_name=os.environ.get("AWS_REGION"),
             bucket_name=os.environ.get("S3_BUCKET_NAME"),
             s3_prefix=os.environ.get("S3_PREFIX"),
             max_to_keep=5

@@ -4,13 +4,21 @@ import boto3
 from botocore.exceptions import ClientError
 
 class CheckpointManager:
-    def __init__(self, checkpoint_dir, bucket_name=None, s3_prefix=None, max_to_keep=5):
+    def __init__(self, checkpoint_dir, bucket_name=None, s3_prefix=None, aws_access_key_id=None, aws_secret_access_key=None, region_name=None, max_to_keep=5):
         self.checkpoint_dir = checkpoint_dir
         self.bucket_name = bucket_name
         self.s3_prefix = s3_prefix
         self.max_to_keep = max_to_keep
-        
-        self.s3_client = boto3.client('s3') if self.bucket_name else None
+
+        if aws_access_key_id and aws_secret_access_key:
+            self.s3_client = boto3.client(
+                's3',
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                region_name=region_name
+            )
+        else:
+            self.s3_client = boto3.client('s3') if self.bucket_name else None
 
     def _get_sorted_local_checkpoints(self):
         search_pattern = os.path.join(self.checkpoint_dir, "checkpoint_*.pt")
