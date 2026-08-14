@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import argparse
 from copy import deepcopy
 from glob import glob
@@ -17,7 +21,8 @@ from ai_engine.models.diffusion_transformer import DiffusionTransformer_models
 from ai_engine.models.t5 import T5Embedder
 from ai_engine.models.vae import VAE
 from dataset.dataset import Flickr8kDataset
-from training.utils import cleanup, create_logger, requires_grad, update_ema, manage_checkpoints
+from training.utils import cleanup, create_logger, requires_grad, update_ema
+from training.manage_checkpoint import CheckpointManager
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -70,6 +75,13 @@ def main(args):
 
         z = torch.randn(1, 4, latent_size, latent_size, device=device)
         fixed_z_cfg = torch.cat([z, z], dim=0)
+        
+        checkpoint_manager = CheckpointManager(
+            checkpoint_dir=checkpoint_dir,
+            bucket_name=os.environ.get("S3_BUCKET_NAME"),
+            s3_prefix=os.environ.get("S3_PREFIX"),
+            max_to_keep=5
+       )
 
         del embedder
         torch.cuda.empty_cache()
@@ -79,7 +91,10 @@ def main(args):
             None, None, None, None
         )
         checkpoint_dir = None
+        checkpoint_manager = None
 
+
+    
     model = DiffusionTransformer_models[args.model.name](input_size=latent_size)
     ema = deepcopy(model).to(device)
     requires_grad(ema, False)
@@ -219,7 +234,9 @@ def main(args):
                     latest_path = f"{checkpoint_dir}/checkpoint_latest.pt"
                     torch.save(checkpoint, latest_path)
 
-                    manage_checkpoints(checkpoint_dir, max_to_keep_checkpoint=5)
+                    checkpoint_manager.manage_local()
+                    if getattr(args.logging, "is_save_to_s3", False):
+                        checkpoint_manager.manage_s3(specific_checkpoint_path=checkpoint_path)
 
                     logger.info(f"Saved checkpoint to {checkpoint_path} and updated latest.pt")
 

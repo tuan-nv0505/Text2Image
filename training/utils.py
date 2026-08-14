@@ -49,14 +49,3 @@ def create_logger(logging_dir):
 
     return logger
 
-
-def manage_checkpoints(checkpoint_dir, max_to_keep_checkpoint=10):
-    checkpoints = sorted(glob(os.path.join(checkpoint_dir, "checkpoint_*.pt")), key=os.path.getmtime)
-    checkpoints = [c for c in checkpoints if "checkpoint_latest.pt" not in c]
-    while len(checkpoints) > max_to_keep_checkpoint:
-        oldest_checkpoint = checkpoints.pop(0)
-        try:
-            if os.path.exists(oldest_checkpoint):
-                os.remove(oldest_checkpoint)
-        except OSError as e:
-            print(f"Error deleting old checkpoint {oldest_checkpoint}: {e}")
