@@ -235,7 +235,7 @@ def main(args):
                     torch.save(checkpoint, latest_path)
 
                     # checkpoint_manager.manage_local()
-                    if getattr(args.logging, "is_save_to_s3", False):
+                    if args.logging.is_save_to_s3:
                         checkpoint_manager.manage_s3(specific_checkpoint_path=checkpoint_path)
 
                     logger.info(f"Saved checkpoint to {checkpoint_path} and updated latest.pt")
