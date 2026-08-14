@@ -230,12 +230,12 @@ def main(args):
                     }
 
                     checkpoint_path = f"{checkpoint_dir}/checkpoint_{train_steps:07d}.pt"
-                    # torch.save(checkpoint, checkpoint_path)
+                    torch.save(checkpoint, checkpoint_path)
 
-                    # latest_path = f"{checkpoint_dir}/checkpoint_latest.pt"
-                    # torch.save(checkpoint, latest_path)
+                    latest_path = f"{checkpoint_dir}/checkpoint_latest.pt"
+                    torch.save(checkpoint, latest_path)
 
-                    # checkpoint_manager.manage_local()
+                    checkpoint_manager.manage_local()
                     if args.logging.is_save_to_s3:
                         checkpoint_manager.manage_s3(specific_checkpoint_path=checkpoint_path)
 
