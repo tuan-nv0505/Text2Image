@@ -75,16 +75,16 @@ def main(args):
 
         z = torch.randn(1, 4, latent_size, latent_size, device=device)
         fixed_z_cfg = torch.cat([z, z], dim=0)
-        
+        print(os.environ.get("AWS_ACCESS_KEY_ID"))
         checkpoint_manager = CheckpointManager(
             checkpoint_dir=checkpoint_dir,
             aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
             aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
-            region_name=os.environ.get("AWS_REGION"),
+            region_name=os.environ.get("AWS_DEFAULT_REGION"),
             bucket_name=os.environ.get("S3_BUCKET_NAME"),
             s3_prefix=os.environ.get("S3_PREFIX"),
             max_to_keep=5
-       )
+        )
 
         del embedder
         torch.cuda.empty_cache()
