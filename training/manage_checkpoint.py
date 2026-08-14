@@ -32,6 +32,7 @@ class CheckpointManager:
                 print(f"[Local] Error deleting {oldest}: {e}")
 
     def manage_s3(self, specific_checkpoint_path=None):
+        print("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
         if not self.s3_client:
             print("[S3] Warning: bucket_name is not configured, skipping S3.")
             return
