@@ -27,7 +27,7 @@ class ModelFactory:
 
     @staticmethod
     def create_vae(*, pretrained_name: str, device: str = "cuda"):
-        return VAE(model_name=pretrained_name, device=device)
+        return VAE(vae=pretrained_name, device=device)
 
     @staticmethod
     def create_diffusion(*, sampling_steps: int):

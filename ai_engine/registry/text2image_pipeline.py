@@ -7,7 +7,7 @@ from PIL import Image
 
 from ai_engine.registry.model_registry import ModelRegistry
 
-from ai_engine.logger import logger
+from utils.logger import logger
 
 
 class TextToImagePipeline:
@@ -68,7 +68,7 @@ class TextToImagePipeline:
             context = torch.cat([cond_embeddings, uncond_embeddings], dim=0).unsqueeze(1)
             mask = torch.cat([cond_mask, uncond_mask], dim=0)
 
-            t5.offload()
+            t5.to("cpu")
 
             logger.debug("T5 successfully offloaded to CPU.")
 
