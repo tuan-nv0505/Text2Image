@@ -1,7 +1,7 @@
 dataset:
-  data_path: /kaggle/input/datasets/tuannv0505/flickr8k/flickr8k
-  latents_path: /kaggle/input/datasets/tuannv0505/flickr8k-latents-train/Flickr8k_latents_train
-  text_embeds_path: /kaggle/input/datasets/tuannv0505/flickr8k-embeddings-train/Flickr8k_embeddings_train
+  data_path: /kaggle/input/datasets/tuanbeomap/flickr8k/flickr8k
+  latents_path: /kaggle/input/datasets/tuanbeomap/flickr8k-latents-train/Flickr8k_latents_train
+  text_embeds_path: /kaggle/input/datasets/tuanbeomap/flickr8k-embeddings-train/Flickr8k_embeddings_train
   image_size: 256
   num_workers: 4
   p_uncond: 0.1
@@ -28,5 +28,5 @@ logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0182100/checkpoint_0182100.pt
+  resume_ckpt: /kaggle/input/datasets/tuanbeomap/checkpoint-0182100/checkpoint_0182100.pt
   is_save_to_s3: true
