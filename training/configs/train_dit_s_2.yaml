@@ -21,12 +21,12 @@ training:
 sampling:
   model_type: ema
   cfg_scale: 1.5
-  num_sampling_steps: 1000
+  num_sampling_steps: 250
   prompt: A man riding a bicycle.
 
 logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0327600/checkpoint_0327600.pt
+  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0348900/checkpoint_0348900.pt
   is_save_to_s3: true
