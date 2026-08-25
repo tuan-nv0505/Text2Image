@@ -101,7 +101,7 @@ def main(args):
     requires_grad(ema, False)
 
     model = DDP(model.to(device), device_ids=[local_rank])
-    diffusion = create_diffusion()
+    diffusion = create_diffusion(timestep_respacing="1000")
 
     logger.info(f"DiT Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
