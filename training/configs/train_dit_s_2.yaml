@@ -28,5 +28,5 @@ logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-03741000/checkpoint_03741000.pt
+  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0374100/checkpoint_0374100.pt
   is_save_to_s3: true
