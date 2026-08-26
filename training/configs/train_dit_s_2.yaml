@@ -20,7 +20,7 @@ training:
 
 sampling:
   model_type: ema
-  cfg_scale: 1.5
+  cfg_scale: 2
   num_sampling_steps: 250
   prompt: Car.
 
