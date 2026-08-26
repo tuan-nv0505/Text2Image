@@ -22,7 +22,7 @@ sampling:
   model_type: ema
   cfg_scale: 1.5
   num_sampling_steps: 250
-  prompt: A man riding a bicycle.
+  prompt: Car.
 
 logging:
   results_dir: results
