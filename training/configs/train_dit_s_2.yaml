@@ -22,11 +22,11 @@ sampling:
   model_type: ema
   cfg_scale: 2
   num_sampling_steps: 250
-  prompt: Car.
+  prompt: A dog is running in the snow.
 
 logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuanbeomap/checkpoint-0396600/checkpoint_0396600.pt
+  resume_ckpt: /kaggle/input/datasets/tuanbeomap/checkpoint-0421200/checkpoint_0421200.pt
   is_save_to_s3: true
