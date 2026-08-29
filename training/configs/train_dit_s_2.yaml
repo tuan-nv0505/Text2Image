@@ -20,7 +20,7 @@ training:
 
 sampling:
   model_type: ema
-  cfg_scale: 1.0
+  cfg_scale: 4.0
   num_sampling_steps: 250
   prompt: A dog is running in the snow.
 
@@ -28,5 +28,5 @@ logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuanbeomap/checkpoint-0421200/checkpoint_0421200.pt
+  resume_ckpt: /kaggle/input/datasets/tuanbeomap/checkpoint-0446100/checkpoint_0446100.pt
   is_save_to_s3: true
