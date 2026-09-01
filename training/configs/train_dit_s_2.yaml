@@ -20,7 +20,7 @@ training:
 
 sampling:
   model_type: ema
-  cfg_scale: 3
+  cfg_scale: 2.0
   num_sampling_steps: 250
   prompt: A man.
 
