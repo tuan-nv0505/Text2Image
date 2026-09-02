@@ -20,13 +20,13 @@ training:
 
 sampling:
   model_type: ema
-  cfg_scale: 2.0
+  cfg_scale: 1.5
   num_sampling_steps: 250
-  prompt: A man.
+  prompt: A black dog and a white dog with brown spots are staring at each other in the street .
 
 logging:
   results_dir: results
   log_every: 100
   ckpt_every: 300
-  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0546900/checkpoint_0546900.pt
+  resume_ckpt: /kaggle/input/datasets/tuannv0505/checkpoint-0570300/checkpoint_0570300.pt
   is_save_to_s3: true
